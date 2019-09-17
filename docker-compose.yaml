@@ -4,6 +4,7 @@ services:
     image: gadm01/gobii_web_vanilla_2c
     ports:
       - "8081:8080"
+    command: start.sh
   gobii-db-node:
     image: gadm01/gobii_db_vanilla_2c
     environment:
