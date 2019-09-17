@@ -1,4 +1,4 @@
-version: '1'
+version: '3'
 services:
   gobii-web-node:
     image: gadm01/gobii_web_vanilla_2c
