@@ -1,6 +1,7 @@
 #Use a release build from gadm01
-FROM gadm01/gobii_db_vanilla:$GOBII_TAG
+FROM gadm01/gobii_db_vanilla_ubuntu:release-2.1-1
 
+VOLUME ["/data"]
 # Set the working directory
 WORKDIR /data
 
@@ -25,13 +26,13 @@ RUN rm -rf /data/liquibase;
 RUN cp -R /var/liquibase /data/liquibase;
 RUN chown -R gadm:gobii /data/liquibase;
 
-#Build the configuration.xml
-COPY gobii-web.properties /data/
-RUN bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /data/gobii-web.properties
+#Build the configuration.xml -- JAVA IS NEEDED, WE NEED TO DO THIS IN THE WEB NODE
+#COPY gobii-web.properties /data/
+#RUN bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /data/gobii-web.properties
 
 
 #copy the Confidentiality file to dir  
-RUN cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/$CROP_NAME/notices;
-RUN chown $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/$CROP_NAME/notices/confidentiality.txt;
-RUN chmod g+rw $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/$CROP_NAME/notices/confidentiality.txt;
+RUN cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/dev/notices;
+#RUN chown $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/dev/notices/confidentiality.txt;
+#RUN chmod g+rw $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/dev/notices/confidentiality.txt;
 
