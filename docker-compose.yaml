@@ -32,7 +32,7 @@ services:
     #  - 
   loader:
     container_name: gobii-loader-ui
-    image: plantandfood/gobii.loader.ui:${LOADER_TAG}
+    image: gadm01/gobii.loader.ui:${LOADER_TAG}
     ports:
       - "4200:4200"
     networks:
