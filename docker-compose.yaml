@@ -28,9 +28,9 @@ services:
     ports:
       - "4200:4200"
     environment:
-      - PORT: "4200"
-      - HOST: "localhost"
-      - BASEURL: "gobii-web-node:8080"
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
 volumes:
   data:
     external: false
