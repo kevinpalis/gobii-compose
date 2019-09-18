@@ -39,10 +39,18 @@ services:
       - gobii-net
     depends_on:
       - "web"
+      - "keycloak"
     environment:
       PORT: "4200"
       HOST: "localhost"
       BASEURL: "gobii-web-node:8080"
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak:${KEYCLOAK_TAG}
+    ports:
+      - "8080:8080"
+    networks:
+      - gobii-net
 volumes:
   data:
     external: false
