@@ -3,7 +3,7 @@ networks:
   gobii-net:
 services:
   web:
-    image: gadm01/gobii_web_vanilla_2c:release-2.1-1
+    image: gadm01/gobii_web_${IMAGE_SUFFIX}:${GOBII_TAG}
     container_name: gobii-web-node
     ports:
       - "8081:8080"
@@ -13,7 +13,7 @@ services:
     depends_on:
       - "db"
   db:
-    image: gadm01/gobii_db_vanilla_2c:release-2.1-1
+    image: gadm01/gobii_db_${IMAGE_SUFFIX}:${GOBII_TAG}
     container_name: gobii-db-node
     ports:
       - "5433:5432"
@@ -25,18 +25,20 @@ services:
     #  - 
   compute:
     container_name: gobii-compute-node
-    image: gadm01/gobii_compute_vanilla_2c:release-2.1-1
+    image: gadm01/gobii_compute_${IMAGE_SUFFIX}:${GOBII_TAG}
     networks:
       - gobii-net
     #environment:
     #  - 
   loader:
     container_name: gobii-loader-ui
-    image: plantandfood/gobii.loader.ui:qa
+    image: plantandfood/gobii.loader.ui:${LOADER_TAG}
     ports:
       - "4200:4200"
     networks:
       - gobii-net
+    depends_on:
+      - "web"
     environment:
       PORT: "4200"
       HOST: "localhost"
