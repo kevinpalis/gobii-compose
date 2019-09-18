@@ -1,5 +1,5 @@
 #Use a release build from gadm01
-FROM gadm01/gobii_db_vanilla_ubuntu:release-2.1-1
+FROM gadm01/gobii_db_vanilla_ubuntu:${GOBII_TAG}
 
 # Set the working directory
 WORKDIR /data
@@ -24,10 +24,6 @@ RUN chown -R gadm:gobii /data/gobii_bundle;
 RUN rm -rf /data/liquibase;
 RUN cp -R /var/liquibase /data/liquibase;
 RUN chown -R gadm:gobii /data/liquibase;
-
-#Build the configuration.xml -- JAVA IS NEEDED, WE NEED TO DO THIS IN THE WEB NODE
-#COPY gobii-web.properties /data/
-#RUN bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /data/gobii-web.properties
 
 
 #copy the Confidentiality file to dir  

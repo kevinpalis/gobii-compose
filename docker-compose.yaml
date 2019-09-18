@@ -2,8 +2,26 @@ version: '3'
 networks:
   gobii-net:
 services:
+  # web:
+  #   build: ./gobii-web
+  #   container_name: gobii-web-node
+  #   ports:
+  #     - "8081:8080"
+  #   networks:
+  #     - gobii-net
+  #   volumes:  
+  #     - app_data:/data
+  #     - ndd_data:/ndd_data
+  #   depends_on:
+  #     - "db"
+  #   stdin_open: true
+  #   tty: true
   db:
-    build: ./gobii-db
+    # build: 
+    #   context: ./gobii-db
+    #   args:
+    #     - GOBII_TAG=${GOBII_TAG}
+    image: gadm01/gobii_db_${IMAGE_SUFFIX}:${GOBII_TAG}
     container_name: gobii-db-node
     ports:
       - "5433:5432"
@@ -15,14 +33,24 @@ services:
       - gobiiuserpassword=${DOCKER_GOBII_ADMIN_PASSWORD}
     volumes:  
       - app_data:/data
-      - ${NDD_PATH}:/ndd_data
+      - ndd_data:/ndd_data
       - gobiipostgresetcubuntu:/etc/postgresql
       - gobiipostgreslogubuntu:/var/log/postgresql
       - gobiipostgreslibubuntu:/var/lib/postgresql
+    #this one's turns interactive mode on (equal to -i)
     stdin_open: true
+    #allocates a pseudo-tty (equal to -t)
     tty: true
+    deploy:
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+        max_attempts: 3
+        window: 120s
 volumes:
   app_data:
+    external: false
+  ndd_data:
     external: false
   gobiipostgresetcubuntu:
     external: false
