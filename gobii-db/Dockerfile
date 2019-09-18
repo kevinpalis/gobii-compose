@@ -1,7 +1,6 @@
 #Use a release build from gadm01
 FROM gadm01/gobii_db_vanilla_ubuntu:release-2.1-1
 
-VOLUME ["/data"]
 # Set the working directory
 WORKDIR /data
 
@@ -36,3 +35,4 @@ RUN cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/de
 #RUN chown $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/dev/notices/confidentiality.txt;
 #RUN chmod g+rw $GOBII_UID:$GOBII_GID /data/gobii_bundle/crops/dev/notices/confidentiality.txt;
 
+VOLUME /data

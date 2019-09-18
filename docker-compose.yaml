@@ -14,20 +14,19 @@ services:
       - gobiigid=${GOBII_GID}
       - gobiiuserpassword=${DOCKER_GOBII_ADMIN_PASSWORD}
     volumes:  
-      - ${DATA_DIR}:/data
+      - app_data:/data
       - ${NDD_PATH}:/ndd_data
-      - tmp_data:/tmp_data
       - gobiipostgresetcubuntu:/etc/postgresql
       - gobiipostgreslogubuntu:/var/log/postgresql
       - gobiipostgreslibubuntu:/var/lib/postgresql
     stdin_open: true
     tty: true
 volumes:
+  app_data:
+    external: false
   gobiipostgresetcubuntu:
     external: false
   gobiipostgreslogubuntu:
     external: false
   gobiipostgreslibubuntu:
-    external: false
-  tmp_data:
     external: false
