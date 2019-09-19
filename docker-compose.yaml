@@ -73,9 +73,6 @@ services:
       - "web"
     stdin_open: true
     tty: true
-  #this service works, but it is a PITA running multiple commands in compose AND even more painful
-  #to mount a shell script and override the entrypoint. Moving to a wrapper script to be able to 
-  #add post-deployment hooks. Keeping this here as there may be other cases this can be useful.
   config:
     image: docker
     container_name: gobii-config-node
@@ -97,7 +94,9 @@ services:
       docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/gobii_bundle' &&
       docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/liquibase' &&
       docker exec gobii-web-node bash -c 'cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/dev/notices;' &&
-      docker exec -u gadm gobii-web-node bash -c 'bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /var/gobii-web.properties'
+      docker exec -u gadm gobii-web-node bash -c 'bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /var/gobii-web.properties' &&
+      docker exec -u gadm gobii-web-node bash -c 'source /var/gobii-web.properties; cd /data/liquibase; java -jar bin/liquibase.jar --username=$$DB_USERNAME --password=$$DB_PASS --url=jdbc:postgresql://$$DOCKER_DB_HOST:$$DOCKER_DB_PORT/$$DB_NAME_CROP1 --driver=org.postgresql.Driver --classpath=drivers/postgresql-9.4.1209.jar --changeLogFile=changelogs/db.changelog-master.xml --contexts=$$LIQUIBASE_CROP1_CONTEXTS update;'
+      docker exec -u gadm gobii-compute-node bash -c 'source /var/gobii-web.properties; cd /data/gobii_bundle/loaders/etc; crontab -r; sh addCron.sh /data/gobii_bundle $$DOCKER_CROP1_NAME $$DOCKER_CRON_INTERVAL $$DOCKER_CRON_FILE_AGE;'
       "
 volumes:
   app_data:
