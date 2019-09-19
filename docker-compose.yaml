@@ -2,26 +2,29 @@ version: '3'
 networks:
   gobii-net:
 services:
-  # web:
-  #   build: ./gobii-web
-  #   container_name: gobii-web-node
-  #   ports:
-  #     - "8081:8080"
-  #   networks:
-  #     - gobii-net
-  #   volumes:  
-  #     - app_data:/data
-  #     - ndd_data:/ndd_data
-  #   depends_on:
-  #     - "db"
-  #   stdin_open: true
-  #   tty: true
+  web:
+    build: ./gobii-web
+    container_name: gobii-web-node
+    ports:
+      - "8081:8080"
+    networks:
+      - gobii-net
+    volumes:  
+      - app_data:/data
+      - ndd_data:/ndd_data
+    depends_on:
+      - "db"
+    stdin_open: true
+    tty: true
   db:
     # build: 
     #   context: ./gobii-db
     #   args:
     #     - GOBII_TAG=${GOBII_TAG}
     image: gadm01/gobii_db_${IMAGE_SUFFIX}:${GOBII_TAG}
+    command: >
+      bash -c "cp -R /var/gobii_bundle /data/gobii_bundle;
+      top"
     container_name: gobii-db-node
     ports:
       - "5433:5432"
@@ -32,7 +35,7 @@ services:
       - gobiigid=${GOBII_GID}
       - gobiiuserpassword=${DOCKER_GOBII_ADMIN_PASSWORD}
     volumes:  
-      - app_data:/data
+      - app_data:/var
       - ndd_data:/ndd_data
       - gobiipostgresetcubuntu:/etc/postgresql
       - gobiipostgreslogubuntu:/var/log/postgresql
