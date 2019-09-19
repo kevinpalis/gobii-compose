@@ -41,6 +41,13 @@ services:
     stdin_open: true
     #allocates a pseudo-tty (equal to -t)
     tty: true
+    #checks if postgres is running and the schema was created
+    healthcheck:
+      test: runuser -l postgres -c "psql -d gobii_dev -c 'select value from gobiiprop;' || exit 1"
+      interval: 1m30s
+      timeout: 20s
+      retries: 3
+    #these don't work with docker-compose up and are simply ignored, but keeping the settings here for when we get to explore swarm
     deploy:
       restart_policy:
         condition: on-failure
