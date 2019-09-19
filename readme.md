@@ -5,6 +5,7 @@
 
 ### Usage
 
+1. Checkout gobii.keycloak alongside this repo if desired to have theme available
 1. Verify `/.env` has correct versions/tags
 1. Start: `docker-compose up -d`
 1. Stop: `docker-compose down`
