@@ -44,6 +44,34 @@ services:
       PORT: "4200"
       HOST: "localhost"
       BASEURL: "gobii-web-node:8080"
+  portal:
+    container_name: gobii-portal-ui
+    image: gadm01/gobii.portal.ui:${PORTAL_TAG}
+    ports:
+      - "4201:4200"
+    networks:
+      - gobii-net
+    depends_on:
+      - "web"
+      - "keycloak"
+    environment:
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
+  jobstatus:
+    container_name: gobii-jobstatus-ui
+    image: gadm01/gobii.jobstatus.ui:${JOBSTATUS_TAG}
+    ports:
+      - "4202:4200"
+    networks:
+      - gobii-net
+    depends_on:
+      - "web"
+      - "keycloak"
+    environment:
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
   keycloak:
     container_name: keycloak
     image: jboss/keycloak:${KEYCLOAK_TAG}
