@@ -98,6 +98,64 @@ services:
       docker exec -u gadm gobii-web-node bash -c 'source /var/gobii-web.properties; cd /data/liquibase; java -jar bin/liquibase.jar --username=$$DB_USERNAME --password=$$DB_PASS --url=jdbc:postgresql://$$DOCKER_DB_HOST:$$DOCKER_DB_PORT/$$DB_NAME_CROP1 --driver=org.postgresql.Driver --classpath=drivers/postgresql-9.4.1209.jar --changeLogFile=changelogs/db.changelog-master.xml --contexts=$$LIQUIBASE_CROP1_CONTEXTS update;' &&
       docker exec -u gadm gobii-compute-node bash -c 'source /var/gobii-web.properties; cd /data/gobii_bundle/loaders/etc; crontab -r; bash addCron.sh /data/gobii_bundle $$DOCKER_CROP1_NAME $$DOCKER_CRON_INTERVAL $$DOCKER_CRON_FILE_AGE;'
       "
+  loader:
+    container_name: gobii-loader-ui
+    image: gadm01/gobii.loader.ui:${LOADER_TAG}
+    ports:
+      - "4200:4200"
+    networks:
+      - gobii-net
+    depends_on:
+      - "web"
+      - "keycloak"
+    environment:
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
+  portal:
+    container_name: gobii-portal-ui
+    image: gadm01/gobii.portal.ui:${PORTAL_TAG}
+    ports:
+      - "4201:4200"
+    networks:
+      - gobii-net
+    depends_on:
+      - "web"
+      - "keycloak"
+    environment:
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
+  jobstatus:
+    container_name: gobii-jobstatus-ui
+    image: gadm01/gobii.jobstatus.ui:${JOBSTATUS_TAG}
+    ports:
+      - "4202:4200"
+    networks:
+      - gobii-net
+    depends_on:
+      - "web"
+      - "keycloak"
+    environment:
+      PORT: "4200"
+      HOST: "localhost"
+      BASEURL: "gobii-web-node:8080"
+  keycloak:
+    container_name: keycloak
+    image: jboss/keycloak:${KEYCLOAK_TAG}
+    ports:
+      - "8080:8080"
+    networks:
+      - gobii-net
+    volumes:
+      # Expecting to have the gobii.keycloak repo checked out besides this one. 
+      # Empty dir created and theme ignored if missing.
+      - ./../gobii.keycloak/themes/gobii/:/opt/jboss/keycloak/themes/gobii/
+    environment:
+      KEYCLOAK_PASSWORD: "admin"
+      KEYCLOAK_USER: "admin"
+    command:
+    - -b 0.0.0.0 --server-config=standalone.xml
 volumes:
   app_data:
     external: false
