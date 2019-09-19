@@ -3,7 +3,7 @@ networks:
   gobii-net:
 services:
   web:
-    build: ./gobii-web
+    image: gadm01/gobii_web_${IMAGE_SUFFIX}:${GOBII_TAG}
     container_name: gobii-web-node
     ports:
       - "8081:8080"
@@ -12,19 +12,18 @@ services:
     volumes:  
       - app_data:/data
       - ndd_data:/ndd_data
+      - ./gobii-web.properties:/var/gobii-web.properties
     depends_on:
       - "db"
     stdin_open: true
     tty: true
+    # entrypoint: /tmp/web-entry.sh
   db:
     # build: 
     #   context: ./gobii-db
     #   args:
     #     - GOBII_TAG=${GOBII_TAG}
     image: gadm01/gobii_db_${IMAGE_SUFFIX}:${GOBII_TAG}
-    command: >
-      bash -c "cp -R /var/gobii_bundle /data/gobii_bundle;
-      top"
     container_name: gobii-db-node
     ports:
       - "5433:5432"
@@ -40,6 +39,9 @@ services:
       - gobiipostgresetcubuntu:/etc/postgresql
       - gobiipostgreslogubuntu:/var/log/postgresql
       - gobiipostgreslibubuntu:/var/lib/postgresql
+    command: >
+      bash -c "cp -R /var/gobii_bundle /data/gobii_bundle;
+      top"
     #this one's turns interactive mode on (equal to -i)
     stdin_open: true
     #allocates a pseudo-tty (equal to -t)
@@ -57,6 +59,46 @@ services:
         delay: 5s
         max_attempts: 3
         window: 120s
+  compute:
+    image: gadm01/gobii_compute_${IMAGE_SUFFIX}:${GOBII_TAG}
+    container_name: gobii-compute-node
+    ports:
+      - "2222:22"
+    networks:
+      - gobii-net
+    volumes:  
+      - app_data:/data
+      - ndd_data:/ndd_data
+    depends_on:
+      - "web"
+    stdin_open: true
+    tty: true
+  #this service works, but it is a PITA running multiple commands in compose AND even more painful
+  #to mount a shell script and override the entrypoint. Moving to a wrapper script to be able to 
+  #add post-deployment hooks. Keeping this here as there may be other cases this can be useful.
+  config:
+    image: docker
+    container_name: gobii-config-node
+    privileged: true
+    # ports:
+    #   - "2222:22"
+    networks:
+      - gobii-net
+    volumes:  
+      - app_data:/data
+      - ndd_data:/ndd_data
+      - /var/run/docker.sock:/var/run/docker.sock
+    depends_on:
+      - "compute"
+    stdin_open: true
+    tty: true
+    # entrypoint: ''
+    command: sh -c "
+      docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/gobii_bundle' &&
+      docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/liquibase' &&
+      docker exec gobii-web-node bash -c 'cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/dev/notices;' &&
+      docker exec -u gadm gobii-web-node bash -c 'bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /var/gobii-web.properties'
+      "
 volumes:
   app_data:
     external: false
