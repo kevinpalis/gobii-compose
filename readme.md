@@ -19,3 +19,7 @@ Allows additional services to come up within the same deployment
 1. Start: `docker-compose -f docker-compose.yaml [-f opt/portainer.yaml] up -d`
 1. Stop: `docker-compose down`
 1. View whats currently online `docker-compose ps`
+
+## Useful Paths
+* /data/gobii_bundle/config/gobii-web.xml
+* /usr/local/tomcat/
