@@ -18,6 +18,11 @@ services:
     stdin_open: true
     tty: true
     # entrypoint: /tmp/web-entry.sh
+    healthcheck:
+      test: "wget --quiet --spider http://localhost:8080/ || exit 1"
+      interval: 10s
+      timeout: 20s
+      retries: 3
   db:
     # build: 
     #   context: ./gobii-db
@@ -112,6 +117,11 @@ services:
       PORT: "4200"
       HOST: "localhost"
       BASEURL: "gobii-web-node:8080"
+    healthcheck:
+      test: "wget -q -s http://localhost:4200/ || exit 1"
+      interval: 10s
+      timeout: 20s
+      retries: 3
   portal:
     container_name: gobii-portal-ui
     image: gadm01/gobii.portal.ui:${PORTAL_TAG}
@@ -126,6 +136,11 @@ services:
       PORT: "4200"
       HOST: "localhost"
       BASEURL: "gobii-web-node:8080"
+    healthcheck:
+      test: "wget -q -s http://localhost:4200/ || exit 1"
+      interval: 10s
+      timeout: 20s
+      retries: 3
   jobstatus:
     container_name: gobii-jobstatus-ui
     image: gadm01/gobii.jobstatus.ui:${JOBSTATUS_TAG}
@@ -140,6 +155,11 @@ services:
       PORT: "4200"
       HOST: "localhost"
       BASEURL: "gobii-web-node:8080"
+    healthcheck:
+      test: "wget -q -s http://localhost:4200/ || exit 1"
+      interval: 10s
+      timeout: 20s
+      retries: 3
   keycloak:
     container_name: keycloak
     image: jboss/keycloak:${KEYCLOAK_TAG}
@@ -156,6 +176,12 @@ services:
       KEYCLOAK_USER: "admin"
     command:
     - -b 0.0.0.0 --server-config=standalone.xml
+    # Older builds of Keycloak dont include curl or wget...
+    #healthcheck:
+    #   test: "wget -q -s http://localhost:4200/ || exit 1"
+    #   interval: 10s
+    #   timeout: 20s
+    #   retries: 3
 volumes:
   app_data:
     external: false
