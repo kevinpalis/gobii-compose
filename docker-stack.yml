@@ -4,9 +4,9 @@ networks:
 services:
   web:
     image: gadm01/gobii_web_${IMAGE_SUFFIX}:${GOBII_TAG}
-    container_name: gobii-web-node
+    #container_name: gobii-web-node
     ports:
-      - "80:8080"
+      - "8081:8080"
     networks:
       - gobii-net
     volumes:  
@@ -18,6 +18,15 @@ services:
     stdin_open: true
     tty: true
     # entrypoint: /tmp/web-entry.sh
+    deploy:
+      replicas: 1
+      #sample usage of resource limits
+      #resources:
+      # limits:
+      #  cpus: "0.1"
+      #  memory: 50M
+      restart_policy:
+        condition: on-failure
     healthcheck:
       test: "wget --quiet --spider http://localhost:8080/ || exit 1"
       interval: 10s
@@ -29,7 +38,7 @@ services:
     #   args:
     #     - GOBII_TAG=${GOBII_TAG}
     image: gadm01/gobii_db_${IMAGE_SUFFIX}:${GOBII_TAG}
-    container_name: gobii-db-node
+    #container_name: gobii-db-node
     ports:
       - "5433:5432"
     networks:
@@ -66,7 +75,7 @@ services:
         window: 120s
   compute:
     image: gadm01/gobii_compute_${IMAGE_SUFFIX}:${GOBII_TAG}
-    container_name: gobii-compute-node
+    #container_name: gobii-compute-node
     ports:
       - "2222:22"
     networks:
@@ -78,33 +87,33 @@ services:
       - "web"
     stdin_open: true
     tty: true
-  config:
-    image: docker
-    container_name: gobii-config-node
-    privileged: true
-    # ports:
-    #   - "2222:22"
-    networks:
-      - gobii-net
-    volumes:  
-      - app_data:/data
-      - ndd_data:/ndd_data
-      - /var/run/docker.sock:/var/run/docker.sock
-    depends_on:
-      - "compute"
-    stdin_open: true
-    tty: true
-    # entrypoint: ''
-    command: sh -c "
-      docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/gobii_bundle' &&
-      docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/liquibase' &&
-      docker exec gobii-web-node bash -c 'cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/dev/notices;' &&
-      docker exec -u gadm gobii-web-node bash -c 'bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /var/gobii-web.properties' &&
-      docker exec -u gadm gobii-web-node bash -c 'source /var/gobii-web.properties; cd /data/liquibase; java -jar bin/liquibase.jar --username=$$DB_USERNAME --password=$$DB_PASS --url=jdbc:postgresql://$$DOCKER_DB_HOST:$$DOCKER_DB_PORT/$$DB_NAME_CROP1 --driver=org.postgresql.Driver --classpath=drivers/postgresql-9.4.1209.jar --changeLogFile=changelogs/db.changelog-master.xml --contexts=$$LIQUIBASE_CROP1_CONTEXTS update;' &&
-      docker exec -u gadm gobii-compute-node bash -c 'source /var/gobii-web.properties; cd /data/gobii_bundle/loaders/etc; crontab -r; bash addCron.sh /data/gobii_bundle $$DOCKER_CROP1_NAME $$DOCKER_CRON_INTERVAL $$DOCKER_CRON_FILE_AGE;'
-      "
+  # config:
+  #   image: docker
+  #   #container_name: gobii-config-node
+  #   privileged: true
+  #   # ports:
+  #   #   - "2222:22"
+  #   networks:
+  #     - gobii-net
+  #   volumes:  
+  #     - app_data:/data
+  #     - ndd_data:/ndd_data
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #   depends_on:
+  #     - "compute"
+  #   stdin_open: true
+  #   tty: true
+  #   # entrypoint: ''
+  #   command: sh -c "
+  #     docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/gobii_bundle' &&
+  #     docker exec gobii-web-node bash -c 'chown -R gadm:gobii /data/liquibase' &&
+  #     docker exec gobii-web-node bash -c 'cp /data/gobii_bundle/config/confidentiality.txt /data/gobii_bundle/crops/dev/notices;' &&
+  #     docker exec -u gadm gobii-web-node bash -c 'bash /data/gobii_bundle/config/gobiiconfig_wrapper.sh /var/gobii-web.properties' &&
+  #     docker exec -u gadm gobii-web-node bash -c 'source /var/gobii-web.properties; cd /data/liquibase; java -jar bin/liquibase.jar --username=$$DB_USERNAME --password=$$DB_PASS --url=jdbc:postgresql://$$DOCKER_DB_HOST:$$DOCKER_DB_PORT/$$DB_NAME_CROP1 --driver=org.postgresql.Driver --classpath=drivers/postgresql-9.4.1209.jar --changeLogFile=changelogs/db.changelog-master.xml --contexts=$$LIQUIBASE_CROP1_CONTEXTS update;' &&
+  #     docker exec -u gadm gobii-compute-node bash -c 'source /var/gobii-web.properties; cd /data/gobii_bundle/loaders/etc; crontab -r; bash addCron.sh /data/gobii_bundle $$DOCKER_CROP1_NAME $$DOCKER_CRON_INTERVAL $$DOCKER_CRON_FILE_AGE;'
+  #     "
   loader:
-    container_name: gobii-loader-ui
+    #container_name: gobii-loader-ui
     image: gadm01/gobii.loader.ui:${LOADER_TAG}
     ports:
       - "4200:4200"
@@ -123,7 +132,7 @@ services:
       timeout: 20s
       retries: 3
   portal:
-    container_name: gobii-portal-ui
+    #container_name: gobii-portal-ui
     image: gadm01/gobii.portal.ui:${PORTAL_TAG}
     ports:
       - "4201:4200"
@@ -142,7 +151,7 @@ services:
       timeout: 20s
       retries: 3
   jobstatus:
-    container_name: gobii-jobstatus-ui
+    #container_name: gobii-jobstatus-ui
     image: gadm01/gobii.jobstatus.ui:${JOBSTATUS_TAG}
     ports:
       - "4202:4200"
@@ -161,7 +170,7 @@ services:
       timeout: 20s
       retries: 3
   keycloak:
-    container_name: keycloak
+    #container_name: keycloak
     image: jboss/keycloak:${KEYCLOAK_TAG}
     ports:
       - "8080:8080"
